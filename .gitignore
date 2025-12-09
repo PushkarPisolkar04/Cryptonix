@@ -134,3 +134,12 @@ burp_*.state
 # Documentation builds
 docs/_build/
 site/
+
+# Project-specific
+STATUS.txt
+verify_build.py
+verify_installation.py
+
+# Utils that may contain sensitive data
+utils/api_cache/
+utils/temp/
