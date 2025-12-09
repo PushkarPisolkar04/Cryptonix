@@ -12,6 +12,8 @@ from dataclasses import dataclass
 class ToolConfig:
     """Configuration for external tools"""
     nmap_path: str = "nmap"
+    sqlmap_path: str = "sqlmap"
+    nikto_path: str = "nikto"
     metasploit_host: str = "127.0.0.1"
     metasploit_port: int = 55553
     metasploit_password: Optional[str] = None
@@ -47,6 +49,8 @@ class Config:
     @classmethod
     def load(cls, config_path: str) -> 'Config':
         """Load configuration from YAML file"""
+        from utils.tool_detector import ToolDetector
+        
         path = Path(config_path)
         
         if not path.exists():
@@ -55,8 +59,22 @@ class Config:
         with open(path, 'r') as f:
             data = yaml.safe_load(f)
         
-        # Parse tool config
-        tools = ToolConfig(**data.get('tools', {}))
+        # Auto-detect tools
+        detector = ToolDetector()
+        detected_tools = detector.detect_all_tools()
+        
+        # Parse tool config with auto-detection fallback
+        tool_data = data.get('tools', {})
+        
+        # Use detected paths if not specified in config
+        if 'nmap_path' not in tool_data and detected_tools.get('nmap'):
+            tool_data['nmap_path'] = detected_tools['nmap']
+        if 'sqlmap_path' not in tool_data and detected_tools.get('sqlmap'):
+            tool_data['sqlmap_path'] = detected_tools['sqlmap']
+        if 'nikto_path' not in tool_data and detected_tools.get('nikto'):
+            tool_data['nikto_path'] = detected_tools['nikto']
+        
+        tools = ToolConfig(**tool_data)
         
         # Parse API config
         apis = APIConfig(**data.get('apis', {}))

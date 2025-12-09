@@ -32,13 +32,19 @@ class PenTestOrchestrator:
     STAGE_MAP = {
         'osint': OSINTStage,
         'discovery': DiscoveryStage,
-        'vuln_scan': VulnerabilityStage,
-        'threat_model': ThreatModelingStage,
-        'exploit_map': ExploitMappingStage,
+        'vulnerability': VulnerabilityStage,
+        'vuln_scan': VulnerabilityStage,  # Alias
+        'threat_modeling': ThreatModelingStage,
+        'threat_model': ThreatModelingStage,  # Alias
+        'exploit_mapping': ExploitMappingStage,
+        'exploit_map': ExploitMappingStage,  # Alias
         'exploitation': ExploitationStage,
-        'post_exploit': PostExploitationStage,
+        'post_exploitation': PostExploitationStage,
+        'post_exploit': PostExploitationStage,  # Alias
         'lateral_movement': LateralMovementStage,
-        'impact_demo': ImpactDemonstrationStage,
+        'lateral': LateralMovementStage,  # Alias
+        'impact': ImpactDemonstrationStage,
+        'impact_demo': ImpactDemonstrationStage,  # Alias
         'reporting': ReportingStage
     }
     
