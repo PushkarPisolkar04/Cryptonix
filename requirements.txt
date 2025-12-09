@@ -1,0 +1,89 @@
+# Core Framework
+python-nmap==0.7.1
+scapy==2.5.0
+requests==2.31.0
+aiohttp==3.9.1
+
+# OSINT & Intelligence
+shodan==1.31.0
+python-whois==0.8.0
+dnspython==2.4.2
+beautifulsoup4==4.12.2
+censys==2.2.8
+pyhunter==1.7
+# linkedin-scraper - has broken dependencies, removed
+requests-html==0.10.0
+
+# Vulnerability Scanning
+python-libnmap==0.7.3
+zaproxy==0.2.0
+# nessus-io - not available on PyPI, use Nessus REST API directly with requests
+
+# Network & Cloud Discovery
+wafw00f==2.2.0
+sslyze==6.0.0
+boto3==1.34.0
+azure-storage-blob==12.19.0
+google-cloud-storage==2.14.0
+paramiko==3.4.0
+
+# Exploitation & Post-Exploitation
+impacket==0.11.0
+pwntools==4.11.0
+ldap3==2.9.1
+pymetasploit3==1.0.3
+
+# Graph & Path Analysis
+networkx==3.2.1
+plotly==5.18.0
+pydot==2.0.0
+
+# Database & Storage
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.9
+pymongo==4.6.1
+redis==5.0.1
+
+# Task Queue & Orchestration
+celery==5.3.4
+kombu==5.3.4
+rq==1.15.0
+
+# Reporting & Visualization
+jinja2==3.1.2
+markdown==3.5.1
+reportlab==4.0.7
+weasyprint==60.1
+python-pptx==0.6.21
+
+# API & Web Interface
+fastapi==0.105.0
+uvicorn==0.25.0
+pydantic==2.5.2
+python-multipart==0.0.6
+
+# Integration & Notifications
+slack-sdk==3.27.0
+jira==3.5.2
+
+# Utilities
+python-dotenv==1.0.0
+pyyaml==6.0.1
+colorama==0.4.6
+tqdm==4.66.1
+loguru==0.7.2
+click==8.1.7
+
+# Security & Crypto
+cryptography==42.0.5
+pycryptodome==3.19.0
+
+# Machine Learning & Analytics
+scikit-learn==1.3.2
+pandas==2.1.4
+numpy==1.26.2
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
