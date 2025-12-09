@@ -22,15 +22,24 @@ choco install nmap -y
 
 ### Run Your First Scan
 
-```powershell
-# Safe OSINT scan (recommended first)
-.\run.ps1 --target example.com --stages osint --dry-run
+**Option 1: Interactive Menu (Easiest - Double-Click)**
 
-# Full assessment (dry-run mode)
+Simply double-click `run.bat` and choose from:
+
+1. **OSINT scan (dry-run)** - Safest option, gathers public information only
+2. **Full assessment (dry-run)** - Safe simulation, no actual exploitation
+3. **Full assessment (REAL)** - ⚠️ Actual exploitation (requires authorization!)
+4. Check dependencies
+5. Show help
+6. Custom command
+
+**Option 2: PowerShell (For Advanced Users)**
+```powershell
+# Dry-run mode (safe simulation)
 .\run.ps1 --target example.com --dry-run
 
-# Get help
-.\run.ps1 --help
+# Real mode (actual exploitation - needs authorization!)
+.\run.ps1 --target example.com
 ```
 
 ---
@@ -51,10 +60,57 @@ Cryptonix automates penetration testing through 10 stages:
 10. **Reporting** - Generate comprehensive reports (HTML, PDF, JSON, Markdown)
 
 **Safety Features:**
-- Dry-run mode (simulate without executing)
-- Automatic rollback
-- Rate limiting
-- Emergency stop (Ctrl+C)
+- **Dry-run mode** - Simulate attacks without executing them
+- **Automatic rollback** - Undo changes on failure
+- **Rate limiting** - Avoid overwhelming targets
+- **Emergency stop** - Press Ctrl+C to abort immediately
+- **Authorization check** - Confirms before real exploitation
+
+---
+
+## 🔍 Dry-Run vs Full Mode
+
+### What is Dry-Run Mode?
+
+**Dry-run mode** = Safe simulation mode
+
+| Feature | Dry-Run Mode (`--dry-run`) | Full Mode (No flag) |
+|---------|---------------------------|---------------------|
+| Scans for vulnerabilities | ✅ Yes | ✅ Yes |
+| Shows what exploits would be used | ✅ Yes | ✅ Yes |
+| Actually exploits vulnerabilities | ❌ No | ✅ Yes |
+| Makes changes to target | ❌ No | ✅ Yes |
+| Can cause damage | ❌ No | ⚠️ Yes |
+| Requires authorization | ⚠️ Recommended | ✅ Required |
+| Safe for testing | ✅ Yes | ❌ No |
+
+### When to Use Each Mode
+
+**Use Dry-Run Mode (`--dry-run`) when:**
+- ✅ Testing the tool for the first time
+- ✅ Learning how it works
+- ✅ Generating vulnerability reports without exploitation
+- ✅ Demonstrating capabilities to clients
+- ✅ You want to be safe
+
+**Use Full Mode (no `--dry-run`) when:**
+- ✅ You have **written authorization**
+- ✅ Testing your **own systems**
+- ✅ You understand the **risks**
+- ✅ You have **backups** ready
+- ✅ You're in a **controlled environment**
+
+### Example
+
+```powershell
+# DRY-RUN (Safe - Recommended)
+.\run.ps1 --target example.com --dry-run
+# Output: "Found SQL injection. Would attempt exploit XYZ"
+
+# FULL MODE (Dangerous - Needs Authorization)
+.\run.ps1 --target example.com
+# Output: Actually attempts SQL injection and accesses database
+```
 
 ---
 
@@ -63,20 +119,49 @@ Cryptonix automates penetration testing through 10 stages:
 ### Basic Commands
 
 ```powershell
-# OSINT only (safest, no active scanning)
+# OSINT only (fastest, safest - 15 seconds)
 .\run.ps1 --target example.com --stages osint --dry-run
 
-# Specific stages
-.\run.ps1 --target example.com --stages discovery,vulnerability --dry-run
+# Discovery scan (scans top 10 subdomains, top 1000 ports - ~2-5 minutes)
+.\run.ps1 --target example.com --stages discovery --dry-run
 
-# Full assessment
+# Full assessment (dry-run - safe, ~5-10 minutes)
 .\run.ps1 --target example.com --dry-run
+
+# Full assessment (REAL - requires authorization!)
+.\run.ps1 --target example.com
+
+# Aggressive mode (scans 50 subdomains, all ports - SLOW, ~30+ minutes)
+.\run.ps1 --target example.com --aggressive --dry-run
 
 # Stealth mode (slower, harder to detect)
 .\run.ps1 --target example.com --stealth --dry-run
 
 # Verbose output
 .\run.ps1 --target example.com --verbose --dry-run
+```
+
+### Scan Speed Guide
+
+| Mode | Subdomains | Ports | Time per Target | Total Time | Command |
+|------|-----------|-------|----------------|------------|---------|
+| **OSINT only** | N/A | N/A | N/A | 15-30 sec | `--stages osint` |
+| **Fast (Normal)** | 10 | Top 1000 | ~30 sec | 2-5 min | Default |
+| **Full (Aggressive)** | 50 | All 65535 | ~2 min | 30+ min | `--aggressive` |
+| **Stealth** | 10 | Top 1000 | ~1 min | 10-20 min | `--stealth` |
+
+**Progress Tracking:**
+- Shows estimated total time at start
+- Updates progress after each target
+- Displays elapsed time and remaining time
+- Shows time taken per target
+
+**Example Output:**
+```
+⏱️  Estimated scan time: 5 minutes 0 seconds
+📊 Progress: 1/10 targets | Elapsed: 28s | Remaining: ~252s | This target: 28s
+📊 Progress: 2/10 targets | Elapsed: 55s | Remaining: ~220s | This target: 27s
+✅ Scan complete! Total time: 4m 32s
 ```
 
 ### Available Stages
@@ -198,12 +283,37 @@ All Python dependencies are installed automatically by `setup.ps1`.
 
 ## ⚠️ Legal & Safety
 
-**IMPORTANT:** Always get written authorization before scanning any target!
+### IMPORTANT WARNINGS
 
-- Unauthorized scanning is illegal
-- Use `--dry-run` mode for testing
-- This tool is for authorized security testing only
-- Follow responsible disclosure practices
+🚨 **Always get written authorization before scanning any target!**
+
+**Legal Requirements:**
+- Unauthorized scanning is **illegal** in most jurisdictions
+- Penalties can include fines and imprisonment
+- Even "harmless" scanning can be prosecuted
+- Get written permission from the target owner
+
+**Best Practices:**
+- ✅ **Always start with `--dry-run` mode**
+- ✅ Test on your own systems first
+- ✅ Have written authorization before full mode
+- ✅ Keep backups before testing
+- ✅ Follow responsible disclosure practices
+- ✅ Document everything you do
+- ❌ Never scan without permission
+- ❌ Never use full mode without authorization
+
+**This tool is for:**
+- Authorized security testing
+- Educational purposes (on your own systems)
+- Professional penetration testing (with contracts)
+- Security research (with permission)
+
+**This tool is NOT for:**
+- Unauthorized hacking
+- Illegal activities
+- Testing systems you don't own
+- Causing damage or disruption
 
 ---
 

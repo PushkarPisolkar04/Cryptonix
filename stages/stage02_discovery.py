@@ -37,7 +37,9 @@ class DiscoveryStage(BaseStage):
         # Expand target list with subdomains from OSINT
         targets = [target]
         if 'subdomains' in osint_data:
-            targets.extend(osint_data['subdomains'][:50])  # Limit to top 50
+            # Limit subdomains to scan (to avoid long scan times)
+            max_subdomains = 10 if not self.scope.aggressive_mode else 50
+            targets.extend(osint_data['subdomains'][:max_subdomains])
         
         results = {
             'hosts': [],

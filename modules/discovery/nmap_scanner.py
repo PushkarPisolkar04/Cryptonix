@@ -2,6 +2,7 @@
 
 import nmap
 import asyncio
+import time
 from typing import List, Dict, Any
 from loguru import logger
 
@@ -15,16 +16,46 @@ class NmapScanner:
         self.nm = nmap.PortScanner()
     
     async def scan_targets(self, targets: List[str]) -> List[Dict[str, Any]]:
-        """Scan multiple targets"""
+        """Scan multiple targets with progress tracking"""
         results = []
+        total = len(targets)
+        start_time = time.time()
         
-        for target in targets:
+        # Estimate time per target based on mode
+        if self.scope.aggressive_mode:
+            est_per_target = 120  # 2 minutes per target (all ports)
+        elif self.scope.stealth_mode:
+            est_per_target = 60   # 1 minute per target (stealth)
+        else:
+            est_per_target = 30   # 30 seconds per target (normal)
+        
+        estimated_total = total * est_per_target
+        logger.info(f"⏱️  Estimated scan time: {estimated_total // 60} minutes {estimated_total % 60} seconds")
+        
+        for idx, target in enumerate(targets, 1):
             try:
+                target_start = time.time()
                 result = await self.scan_single(target)
+                target_elapsed = time.time() - target_start
+                
                 if result:
                     results.append(result)
+                
+                # Progress update
+                elapsed = time.time() - start_time
+                avg_time = elapsed / idx
+                remaining = (total - idx) * avg_time
+                
+                logger.info(f"📊 Progress: {idx}/{total} targets | "
+                          f"Elapsed: {int(elapsed)}s | "
+                          f"Remaining: ~{int(remaining)}s | "
+                          f"This target: {int(target_elapsed)}s")
+                
             except Exception as e:
                 logger.error(f"Scan failed for {target}: {e}")
+        
+        total_elapsed = time.time() - start_time
+        logger.success(f"✅ Scan complete! Total time: {int(total_elapsed // 60)}m {int(total_elapsed % 60)}s")
         
         return results
     
@@ -35,9 +66,15 @@ class NmapScanner:
         # Build scan arguments
         args = self._build_scan_args()
         
+        # Determine port range based on mode
+        if self.scope.aggressive_mode:
+            ports = '1-65535'  # All ports (slow)
+        else:
+            ports = '1-1000'  # Top 1000 ports (fast)
+        
         # Run scan in thread pool (nmap is blocking)
         loop = asyncio.get_event_loop()
-        await loop.run_in_executor(None, self.nm.scan, target, '1-65535', args)
+        await loop.run_in_executor(None, self.nm.scan, target, ports, args)
         
         # Parse results
         result = {
