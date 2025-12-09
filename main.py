@@ -17,6 +17,7 @@ from core.config import Config
 from core.models import AssessmentScope, AssessmentResult
 from utils.banner import print_banner
 from utils.validators import validate_target, validate_scope
+from utils.validators import extract_host
 
 
 @click.command()
@@ -71,8 +72,11 @@ def main(
         logger.info(f"Running stages: {', '.join(selected_stages)}")
     
     # Load scope
+    # Normalize the target so scanners receive a hostname/IP (strip scheme/path)
+    normalized_target = extract_host(target)
+
     assessment_scope = AssessmentScope(
-        target=target,
+        target=normalized_target,
         scope_file=scope,
         dry_run=dry_run,
         stealth_mode=stealth,

@@ -1,0 +1,24 @@
+# Example scope for local VulnHub / VM testing
+# Use the VM IP (no scheme) or domain only. Do NOT include http:// or https://
+
+# Target: replace with your VM's IP (example below)
+target: "192.168.56.101"
+
+# Excluded hosts (out of scope)
+excluded_hosts: []
+
+# Excluded ports
+excluded_ports: []
+
+# Scan intensity: for local vulnerable VMs, disable stealth and enable aggressive
+stealth_mode: false
+aggressive_mode: true
+
+# Limits
+max_threads: 10
+timeout: 600
+
+# Authorization (for record-keeping)
+authorized_by: "Self-Testing"
+authorization_date: "2025-12-09"
+scope_document: "VulnHub / Lab VM testing scope"

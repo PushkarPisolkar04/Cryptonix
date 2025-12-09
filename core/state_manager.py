@@ -51,6 +51,16 @@ class StateManager:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
+            # Convert StageResult to dict if needed
+            if hasattr(data, '__dict__'):
+                data_dict = {}
+                for key, value in data.__dict__.items():
+                    if hasattr(value, '__dict__'):
+                        data_dict[key] = value.__dict__
+                    else:
+                        data_dict[key] = value
+                data = data_dict
+            
             # Serialize data
             serialized = json.dumps(data, default=str)
             timestamp = datetime.now().isoformat()

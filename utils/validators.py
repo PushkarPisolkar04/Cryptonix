@@ -39,6 +39,55 @@ def validate_target(target: str) -> bool:
     return False
 
 
+def extract_host(target: str) -> str:
+    """Extract a clean host (hostname or IP) from a target string.
+
+    Accepts full URLs (with scheme and path), plain hostnames, IPs, and host:port
+    strings. Returns the hostname or IP (without scheme or path). If parsing
+    fails, returns the original string.
+    """
+    # Quick guard
+    if not target or not isinstance(target, str):
+        return target
+
+    # If URL-like, parse and extract netloc
+    try:
+        from urllib.parse import urlparse
+
+        parsed = urlparse(target)
+        if parsed.scheme and parsed.netloc:
+            # netloc may include credentials or port; strip credentials
+            netloc = parsed.netloc
+            if '@' in netloc:
+                netloc = netloc.split('@')[-1]
+            # remove trailing port if present for consistency
+            if ':' in netloc:
+                host = netloc.split(':')[0]
+            else:
+                host = netloc
+            return host
+    except Exception:
+        pass
+
+    # If contains path but no scheme (e.g., example.com/path), try split
+    if '/' in target:
+        try:
+            host = target.split('/')[0]
+            if host:
+                return host
+        except Exception:
+            pass
+
+    # If host:port, return host part
+    if ':' in target:
+        try:
+            return target.split(':')[0]
+        except Exception:
+            pass
+
+    return target
+
+
 def validate_scope(scope_file: str) -> bool:
     """Validate scope configuration file"""
     path = Path(scope_file)

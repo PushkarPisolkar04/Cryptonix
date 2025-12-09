@@ -5,6 +5,7 @@ import asyncio
 import time
 from typing import List, Dict, Any
 from loguru import logger
+from urllib.parse import urlparse
 
 
 class NmapScanner:
@@ -62,7 +63,9 @@ class NmapScanner:
     async def scan_single(self, target: str) -> Dict[str, Any]:
         """Scan a single target"""
         logger.info(f"Scanning {target}...")
-        
+        # Normalize target: accept URLs (http://...) as well as host/IP
+        clean_target = self._normalize_target(target)
+
         # Build scan arguments
         args = self._build_scan_args()
         
@@ -74,11 +77,11 @@ class NmapScanner:
         
         # Run scan in thread pool (nmap is blocking)
         loop = asyncio.get_event_loop()
-        await loop.run_in_executor(None, self.nm.scan, target, ports, args)
+        await loop.run_in_executor(None, self.nm.scan, clean_target, ports, args)
         
         # Parse results
         result = {
-            'ip': target,
+            'ip': clean_target,
             'hostname': None,
             'status': 'down',
             'os': None,
@@ -123,6 +126,41 @@ class NmapScanner:
                         })
         
         return result
+
+    def _normalize_target(self, target: str) -> str:
+        """Return a hostname or IP extracted from a URL or host string."""
+        if not target or not isinstance(target, str):
+            return target
+
+        # If it's a URL with scheme, parse netloc
+        try:
+            parsed = urlparse(target)
+            if parsed.scheme and parsed.netloc:
+                netloc = parsed.netloc
+                if '@' in netloc:
+                    netloc = netloc.split('@')[-1]
+                # strip port if present
+                if ':' in netloc:
+                    return netloc.split(':')[0]
+                return netloc
+        except Exception:
+            pass
+
+        # If contains path but no scheme (e.g., example.com/path), split
+        if '/' in target:
+            try:
+                return target.split('/')[0]
+            except Exception:
+                pass
+
+        # If host:port, return host part
+        if ':' in target:
+            try:
+                return target.split(':')[0]
+            except Exception:
+                pass
+
+        return target
     
     def _build_scan_args(self) -> str:
         """Build nmap scan arguments based on scope"""

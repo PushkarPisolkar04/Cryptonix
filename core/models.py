@@ -159,10 +159,17 @@ class AssessmentResult:
     def _update_vuln_counts(self):
         """Update vulnerability counts by severity"""
         self.total_vulnerabilities = len(self.vulnerabilities)
-        self.critical_vulns = sum(1 for v in self.vulnerabilities if v.severity == Severity.CRITICAL)
-        self.high_vulns = sum(1 for v in self.vulnerabilities if v.severity == Severity.HIGH)
-        self.medium_vulns = sum(1 for v in self.vulnerabilities if v.severity == Severity.MEDIUM)
-        self.low_vulns = sum(1 for v in self.vulnerabilities if v.severity == Severity.LOW)
+        
+        # Handle both dict and object formats
+        def get_severity(v):
+            if isinstance(v, dict):
+                return v.get('severity', 'info')
+            return v.severity if hasattr(v, 'severity') else 'info'
+        
+        self.critical_vulns = sum(1 for v in self.vulnerabilities if get_severity(v) in [Severity.CRITICAL, 'critical'])
+        self.high_vulns = sum(1 for v in self.vulnerabilities if get_severity(v) in [Severity.HIGH, 'high'])
+        self.medium_vulns = sum(1 for v in self.vulnerabilities if get_severity(v) in [Severity.MEDIUM, 'medium'])
+        self.low_vulns = sum(1 for v in self.vulnerabilities if get_severity(v) in [Severity.LOW, 'low'])
     
     def add_error(self, stage: str, error: str):
         """Add an error for a specific stage"""
