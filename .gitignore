@@ -16,54 +16,121 @@ parts/
 sdist/
 var/
 wheels/
+pip-wheel-metadata/
+share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
 # Virtual Environment
 venv/
 env/
 ENV/
 .venv
+env.bak/
+venv.bak/
 
-# IDE
+# IDE & Editors
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+.project
+.pydevproject
+.settings/
+*.sublime-project
+*.sublime-workspace
 
-# Configuration
+# Configuration & Secrets
 config/config.yaml
 config/scope.yaml
+!config/*.example.yaml
 *.key
 *.pem
+*.crt
+*.csr
+.env
+.env.local
+secrets.yaml
+api_keys.txt
 
 # Reports and Output
 reports/
 output/
+results/
+scans/
 *.log
 *.db
 state.db
+*.sqlite
+*.sqlite3
 
-# Sensitive Data
+# Sensitive Data & Artifacts
 credentials/
 sessions/
+loot/
+evidence/
 *.pcap
 *.cap
+*.pcapng
+*.dmp
+*.dump
+screenshots/
+exploits/local/
+*.hash
+*.hashes
+wordlists/custom/
 
 # OS
 .DS_Store
 Thumbs.db
 desktop.ini
+ehthumbs.db
+*.lnk
 
 # Testing
 .pytest_cache/
 .coverage
+.coverage.*
 htmlcov/
 .tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+.pytype/
 
 # Temporary
 tmp/
 temp/
 *.tmp
+*.bak
+*.swp
+*.cache
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+*.ipynb
+
+# Metasploit
+.msf4/
+.msf4/loot/
+.msf4/logs/
+
+# Nmap
+*.nmap
+*.gnmap
+*.xml
+
+# Burp Suite
+burp_*.state
+
+# Documentation builds
+docs/_build/
+site/
