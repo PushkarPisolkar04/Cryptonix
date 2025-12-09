@@ -26,12 +26,15 @@ choco install nmap -y
 
 Simply double-click `run.bat` and choose from:
 
-1. **OSINT scan (dry-run)** - Safest option, gathers public information only
-2. **Full assessment (dry-run)** - Safe simulation, no actual exploitation
-3. **Full assessment (REAL)** - ⚠️ Actual exploitation (requires authorization!)
-4. Check dependencies
-5. Show help
-6. Custom command
+1. **OSINT scan only** - Fastest (15-30 sec), gathers public info only
+2. **Fast scan** - Quick scan (2-5 min), 10 subdomains, top 1000 ports
+3. **Full scan** - Deep scan (30+ min), 50 subdomains, all 65535 ports
+4. **REAL exploitation** - ⚠️ Actual exploitation (requires authorization!)
+5. Check dependencies
+6. Show help
+7. Custom command
+
+Each option shows estimated time and progress updates!
 
 **Option 2: PowerShell (For Advanced Users)**
 ```powershell
