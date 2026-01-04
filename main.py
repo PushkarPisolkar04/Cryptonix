@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
 """
-AutoPenTest - Automated Penetration Testing Orchestrator
-Main entry point for the assessment pipeline
+Cryptonix - Advanced Automated Penetration Testing Orchestrator
+Main entry point for the professional assessment pipeline
 """
 
 import asyncio
 import sys
+import platform
 from pathlib import Path
 from typing import List, Optional
+
+# Check if running on Linux
+# Check if running on Linux
+if platform.system().lower() != 'linux':
+    print(f"⚠️  Running on {platform.system()}. Some advanced features (Nmap, Metasploit) may be limited.")
 
 import click
 from loguru import logger

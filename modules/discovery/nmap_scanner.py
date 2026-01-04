@@ -1,6 +1,8 @@
 """Nmap scanner wrapper"""
 
 import nmap
+import socket
+
 import asyncio
 import time
 from typing import List, Dict, Any
@@ -14,7 +16,13 @@ class NmapScanner:
     def __init__(self, config, scope):
         self.config = config
         self.scope = scope
-        self.nm = nmap.PortScanner()
+        try:
+            self.nm = nmap.PortScanner()
+            self.has_nmap = True
+        except (nmap.PortScannerError, FileNotFoundError, Exception):
+            logger.warning("⚠️  Nmap not found or failed to initialize. Using built-in Python scanner (slower, limited features).")
+            self.nm = None
+            self.has_nmap = False
     
     async def scan_targets(self, targets: List[str]) -> List[Dict[str, Any]]:
         """Scan multiple targets with progress tracking"""
@@ -75,9 +83,14 @@ class NmapScanner:
         else:
             ports = '1-1000'  # Top 1000 ports (fast)
         
-        # Run scan in thread pool (nmap is blocking)
-        loop = asyncio.get_event_loop()
-        await loop.run_in_executor(None, self.nm.scan, clean_target, ports, args)
+        if self.has_nmap:
+            # Run scan in thread pool (nmap is blocking)
+            loop = asyncio.get_event_loop()
+            await loop.run_in_executor(None, self.nm.scan, clean_target, ports, args)
+        else:
+            # Use fallback scanner
+            return await self._scan_socket_async(clean_target, ports)
+
         
         # Parse results
         result = {
@@ -174,3 +187,67 @@ class NmapScanner:
             args.extend(['-sV', '-O', '-T3'])  # Service version, OS detection, normal timing
         
         return ' '.join(args)
+
+    async def _scan_socket_async(self, target: str, port_range: str) -> Dict[str, Any]:
+        """Fallback scanner using Python sockets"""
+        logger.info(f"Using fallback scanner for {target}...")
+        
+        result = {
+            'ip': target,
+            'hostname': target,
+            'status': 'up',
+            'os': 'Unknown (Scanner limitation)',
+            'ports': [],
+            'services': []
+        }
+        
+        # Parse ports
+        ports_to_scan = []
+        if port_range == '1-65535':
+            # Limit fallback scan to common ports to avoid taking forever
+            ports_to_scan = [21, 22, 23, 25, 53, 80, 110, 111, 135, 139, 143, 443, 445, 993, 995, 1433, 3306, 3389, 5432, 5900, 8080, 8443]
+            logger.info("Fallback mode: Scanning top common ports only")
+        elif '-' in port_range:
+            start, end = map(int, port_range.split('-'))
+            # Cap at top 100 for speed if range is large
+            if end - start > 100:
+                ports_to_scan = [p for p in range(start, start+100)]
+            else:
+                ports_to_scan = [p for p in range(start, end+1)]
+        else:
+             ports_to_scan = [int(p) for p in port_range.split(',')]
+
+        async def check_port(ip, port):
+            try:
+                fut = asyncio.open_connection(ip, port)
+                reader, writer = await asyncio.wait_for(fut, timeout=1.0)
+                writer.close()
+                await writer.wait_closed()
+                return port, True
+            except:
+                return port, False
+
+        tasks = [check_port(target, p) for p in ports_to_scan]
+        results = await asyncio.gather(*tasks)
+        
+        for port, is_open in results:
+            if is_open:
+                service_name = socket.getservbyport(port, 'tcp') if port < 1024 else 'unknown'
+                
+                result['ports'].append({
+                    'port': port,
+                    'protocol': 'tcp',
+                    'state': 'open',
+                    'service': service_name
+                })
+                
+                result['services'].append({
+                    'port': port,
+                    'name': service_name,
+                    'product': 'Unknown',
+                    'version': '',
+                    'extrainfo': 'Socket Scan'
+                })
+                
+        return result
+

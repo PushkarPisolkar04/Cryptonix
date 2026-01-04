@@ -1,11 +1,13 @@
 """
-Main orchestrator that coordinates all assessment stages
+Cryptonix - Main orchestrator that coordinates all assessment stages
 """
 
 import asyncio
 from datetime import datetime
 from typing import List, Optional
 from pathlib import Path
+import platform
+import sys
 
 from loguru import logger
 
@@ -27,7 +29,7 @@ from stages import (
 
 
 class PenTestOrchestrator:
-    """Orchestrates the entire penetration testing pipeline"""
+    """Cryptonix - Orchestrates the entire penetration testing pipeline"""
     
     STAGE_MAP = {
         'osint': OSINTStage,
@@ -49,6 +51,10 @@ class PenTestOrchestrator:
     }
     
     def __init__(self, config: Config, output_dir: str):
+        # Check if running on Linux
+        if platform.system().lower() != 'linux':
+            logger.warning("⚠️  Running on {}. Some features may be limited.".format(platform.system()))
+            
         self.config = config
         self.output_dir = Path(output_dir)
         self.state_manager = StateManager(self.output_dir / 'state.db')
@@ -58,7 +64,7 @@ class PenTestOrchestrator:
         scope: AssessmentScope,
         selected_stages: Optional[List[str]] = None
     ) -> AssessmentResult:
-        """Run the complete assessment pipeline"""
+        """Run the complete PROFESSIONAL assessment pipeline"""
         
         start_time = datetime.now()
         logger.info("="*60)

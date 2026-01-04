@@ -19,6 +19,34 @@ python-libnmap==0.7.3
 zaproxy==0.2.0
 # nessus-io - not available on PyPI, use Nessus REST API directly with requests
 
+# Advanced Web Scanning & Crawling
+scrapy==2.11.0
+selenium==4.17.2
+playwright==1.40.0
+# w3af-api==1.0.0
+
+
+# Advanced Fuzzing & Payload Generation
+wfuzz==3.1.0
+fuzzywuzzy==0.18.0
+python-Levenshtein==0.25.0
+
+# Advanced Security Headers & TLS Analysis
+securityheaders==0.2.0
+pyopenssl==24.0.0
+certifi==2024.2.2
+urllib3==2.2.0
+
+# Machine Learning for Vulnerability Detection
+keras==3.0.5
+tensorflow==2.15.0
+scikit-learn==1.3.2
+
+# Advanced Web Parsing & Analysis
+lxml==5.1.0
+html5lib==1.1
+feedparser==6.0.10
+
 # Network & Cloud Discovery
 wafw00f==2.2.0
 sslyze==6.0.0
@@ -82,6 +110,8 @@ pycryptodome==3.19.0
 scikit-learn==1.3.2
 pandas==2.1.4
 numpy==1.26.2
+matplotlib==3.8.2
+seaborn==0.13.2
 
 # Testing
 pytest==7.4.3

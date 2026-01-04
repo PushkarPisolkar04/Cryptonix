@@ -12,10 +12,10 @@ def print_banner():
     banner = f"""
 {Fore.CYAN}================================================================
                                                                
-     {Fore.RED}CRYPTONIX - Automated Penetration Testing{Fore.CYAN}
+     {Fore.RED}Cryptonix - Advanced Pen Testing{Fore.CYAN}
                                                                
-     {Fore.YELLOW}Automated Penetration Testing Orchestrator{Fore.CYAN}
-     {Fore.GREEN}v1.0.0 - Full Pipeline{Fore.CYAN}
+     {Fore.YELLOW}Professional Automated Penetration Testing{Fore.CYAN}
+     {Fore.GREEN}v2.0.0 - Enhanced Pipeline{Fore.CYAN}
                                                                
 ================================================================{Style.RESET_ALL}
 
@@ -27,7 +27,7 @@ def print_banner():
     except UnicodeEncodeError:
         # Fallback to plain ASCII if Unicode fails
         print("\n" + "="*60)
-        print("CRYPTONIX - Automated Penetration Testing")
-        print("v1.0.0 - Full Pipeline")
+        print("Cryptonix - Advanced Pen Testing")
+        print("v2.0.0 - Enhanced Pipeline")
         print("="*60)
         print("\nWARNING: For authorized security testing only!\n")

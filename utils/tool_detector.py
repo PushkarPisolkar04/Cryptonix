@@ -1,24 +1,29 @@
 """
-Automatic tool detection for Windows and Linux
-Finds installed security tools regardless of OS
+Cryptonix - Automatic tool detection for Linux
+Finds installed security tools on Linux systems
 """
 
 import os
 import platform
 import shutil
+import sys
 from pathlib import Path
 from typing import Optional, Dict
 from loguru import logger
 
 
 class ToolDetector:
-    """Detect and locate security tools on any OS"""
+    """Cryptonix - Detect and locate security tools on Linux only"""
     
     def __init__(self):
         self.os_type = platform.system().lower()
         self.is_windows = self.os_type == 'windows'
         self.is_linux = self.os_type == 'linux'
         self.is_kali = self._is_kali_linux()
+        
+        # Check if running on Linux
+        if not self.is_linux:
+            logger.warning("⚠️  Running on non-Linux system ({}). Tool detection adapted for Windows.".format(self.os_type))
         
         logger.info(f"OS detected: {self.os_type}")
         if self.is_kali:

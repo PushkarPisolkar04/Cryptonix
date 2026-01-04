@@ -1,5 +1,5 @@
 """
-Base class for all assessment stages
+Cryptonix - Base class for all assessment stages
 """
 
 from abc import ABC, abstractmethod
@@ -13,7 +13,7 @@ from core.models import AssessmentScope, StageResult
 
 
 class BaseStage(ABC):
-    """Base class for all assessment stages"""
+    """Cryptonix - Base class for all assessment stages"""
     
     def __init__(self, config: Config, scope: AssessmentScope, previous_results: Dict[str, Any]):
         self.config = config
@@ -40,7 +40,7 @@ class BaseStage(ABC):
         pass
     
     async def execute(self) -> StageResult:
-        """Execute the stage and return results"""
+        """Execute the PROFESSIONAL stage and return results"""
         self.start_time = datetime.now()
         logger.info(f"Starting {self.name}")
         logger.info(f"Description: {self.description}")

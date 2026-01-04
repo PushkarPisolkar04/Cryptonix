@@ -41,16 +41,16 @@ class OSINTStage(BaseStage):
             'breached_credentials': [],
             'certificates': [],
             'shodan_data': {},
-            'social_media': {}
         }
         
         # Run all OSINT modules concurrently
         tasks = []
         
         # WHOIS lookup
-        logger.info("🔍 Running WHOIS lookup...")
-        whois_module = WhoisLookup(self.config)
-        tasks.append(self._run_whois(whois_module, target, results))
+        if self.config.tools.whois_enabled:
+            logger.info("🔍 Performing WHOIS lookup...")
+            whois_module = WhoisLookup(self.config)
+            tasks.append(self._run_whois(whois_module, target, results))
         
         # Subdomain enumeration
         logger.info("🔍 Enumerating subdomains...")
@@ -58,18 +58,18 @@ class OSINTStage(BaseStage):
         tasks.append(self._run_subdomain_enum(subdomain_module, target, results))
         
         # Email harvesting
-        logger.info("🔍 Harvesting emails...")
+        logger.info("🔍 Harvesting email addresses...")
         email_module = EmailHarvester(self.config)
         tasks.append(self._run_email_harvest(email_module, target, results))
         
-        # Shodan search
+        # Shodan search (if API key provided)
         if self.config.apis.shodan_api_key:
             logger.info("🔍 Searching Shodan...")
             shodan_module = ShodanSearch(self.config)
             tasks.append(self._run_shodan(shodan_module, target, results))
         
-        # Breach data check
-        if self.config.apis.haveibeenpwned_api_key:
+        # Breach checking
+        if self.config.tools.hibp_enabled:
             logger.info("🔍 Checking breach databases...")
             breach_module = BreachChecker(self.config)
             tasks.append(self._run_breach_check(breach_module, target, results))
@@ -87,11 +87,7 @@ class OSINTStage(BaseStage):
         # Wait for all tasks to complete
         await asyncio.gather(*tasks, return_exceptions=True)
         
-        # Summary
-        logger.success(f"✅ Found {len(results['subdomains'])} subdomains")
-        logger.success(f"✅ Found {len(results['emails'])} email addresses")
-        logger.success(f"✅ Found {len(results['breached_credentials'])} breached credentials")
-        
+        logger.success(f"OSINT gathering completed. Found {len(results['subdomains'])} subdomains and {len(results['emails'])} emails")
         return results
     
     async def _run_whois(self, module, target, results):
@@ -102,13 +98,15 @@ class OSINTStage(BaseStage):
     
     async def _run_subdomain_enum(self, module, target, results):
         try:
-            results['subdomains'] = await module.enumerate(target)
+            subdomains = await module.enumerate(target)
+            results['subdomains'].extend(subdomains)
         except Exception as e:
             logger.warning(f"Subdomain enumeration failed: {e}")
     
     async def _run_email_harvest(self, module, target, results):
         try:
-            results['emails'] = await module.harvest(target)
+            emails = await module.harvest(target)
+            results['emails'].extend(emails)
         except Exception as e:
             logger.warning(f"Email harvesting failed: {e}")
     
@@ -133,5 +131,7 @@ class OSINTStage(BaseStage):
     async def _run_social_media(self, module, target, results):
         try:
             results['social_media'] = await module.gather(target)
+                    
+            logger.success(f"Social media gathering completed")
         except Exception as e:
             logger.warning(f"Social media gathering failed: {e}")

@@ -74,7 +74,7 @@ class SQLMapRunner:
                 urls.append(host)
         
         # Generate test URLs for common parameters
-        if hasattr(host, 'ip'):
+        if hasattr(host, 'ip') or hasattr(host, 'hostname'):
             base_urls = []
             for port_info in getattr(host, 'open_ports', []):
                 port = port_info.get('port', 0)
@@ -82,7 +82,23 @@ class SQLMapRunner:
                 
                 if service in ['http', 'https'] or port in [80, 443, 8080, 8443]:
                     protocol = 'https' if port in [443, 8443] else 'http'
-                    base_urls.append(f'{protocol}://{host.ip}:{port}')
+                    
+                    # Add both IP and hostname if available
+                    targets = []
+                    if hasattr(host, 'ip'):
+                        targets.append(host.ip)
+                    if hasattr(host, 'hostname') and host.hostname:
+                        targets.append(host.hostname)
+                    
+                    # If neither IP nor hostname, use string representation
+                    if not targets:
+                        targets.append(str(host))
+                    
+                    for target in targets:
+                        if port in [80, 443]:
+                            base_urls.append(f'{protocol}://{target}')
+                        else:
+                            base_urls.append(f'{protocol}://{target}:{port}')
             
             # Add common vulnerable endpoints
             for base_url in base_urls:
